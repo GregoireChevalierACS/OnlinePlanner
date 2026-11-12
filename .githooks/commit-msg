@@ -1,0 +1,9 @@
+#!/bin/sh
+# Vérifie le format : "AAAA-MM-JJ # N : (type) description"
+msg=$(head -n1 "$1")
+case "$msg" in Merge*|Revert*) exit 0;; esac
+if ! printf '%s' "$msg" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2} # [1-9][0-9]* : \((feat|fix|docs|test|refactor|chore|build|ci|style|perf)\) .+'; then
+  echo "Format attendu : AAAA-MM-JJ # N : (type) description" >&2
+  echo "Types : feat fix docs test refactor chore build ci style perf" >&2
+  exit 1
+fi
