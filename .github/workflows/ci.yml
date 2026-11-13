@@ -39,7 +39,12 @@ jobs:
       - run: composer install --no-interaction --no-progress
       - run: vendor/bin/php-cs-fixer check --diff
       - run: vendor/bin/phpstan analyse --no-progress
-      - run: vendor/bin/phpunit
+      - name: Tests et couverture
+        run: vendor/bin/phpunit --coverage-clover var/coverage/clover.xml
+      - name: Couverture du domaine = 100 %
+        run: php bin/check-coverage.php var/coverage/clover.xml 100 /Domain/
+      - name: Tests de mutation du domaine (MSI >= 80 %)
+        run: vendor/bin/infection --threads=max --no-progress
 
   frontend:
     runs-on: ubuntu-latest
