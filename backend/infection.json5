@@ -1,12 +1,12 @@
 {
     "$schema": "vendor/infection/infection/resources/schema.json",
-    // Tests de mutation sur le domaine uniquement (cf. bonnes-pratiques.md : score >= 80 %)
+    // Tests de mutation sur le domaine et la couche application (cf. bonnes-pratiques.md : score >= 80 %)
     "source": {
-        "directories": ["src/Shared/Domain", "src/Scheduling/Domain"]
+        "directories": ["src/Shared/Domain", "src/Shared/Application", "src/Scheduling/Domain", "src/Scheduling/Application"]
     },
     "minMsi": 80,
     "minCoveredMsi": 80,
-    "testFrameworkOptions": "--testsuite=unit",
+    "testFrameworkOptions": "--testsuite=unit,contract",
     "logs": {
         "text": "var/infection/infection.log",
         "github": true
