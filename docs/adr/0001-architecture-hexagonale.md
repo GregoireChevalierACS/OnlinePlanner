@@ -33,8 +33,11 @@ Le backend est découpé par contexte métier (`Scheduling`, plus tard `Identity
 | Domain Event / Observer | `Appointment/Event/*` | Notifications découplées du cas d'usage |
 | Factory | `AppointmentStatuses::fromName()` | Reconstruction d'un état persisté |
 | Domain Service | `AvailabilityCalculator` | Calcul qui n'appartient à aucun agrégat |
-| Port / Adapter | `Clock`, dépôts à venir | Domaine testable sans infrastructure |
-| Command / Query (CQRS), Repository, Adapter | phases suivantes | Voir `ROADMAP.md` |
+| Port / Adapter | `Clock`, `IdGenerator`, `DomainEventPublisher`, `CommandBus`, `QueryBus` | Domaine et application testables sans infrastructure |
+| Repository | `AppointmentRepository`, `ProviderRepository` (ports du domaine), adapters en mémoire | Persistance interchangeable, vérifiée par une suite de contrat commune |
+| Command / Query (CQRS) | `Scheduling/Application/Command`, `Query` | Écritures et lectures séparées ; une commande ne renvoie rien (l'identifiant est créé par l'appelant) |
+| DTO de lecture | `SlotView`, `AppointmentView` | Le domaine n'est jamais exposé à l'interface |
+| Object Mother | `tests/Fixture` | Jeux de données de test lisibles et réutilisés |
 
 ## Conséquences
 

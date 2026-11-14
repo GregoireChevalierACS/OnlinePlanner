@@ -6,9 +6,10 @@
 - [x] CI : style, PHPStan max, tests, format des commits ; `main` protégée
 - [x] Domaine `Scheduling` : créneaux, horaires, règles de réservation, statuts, événements
 - [x] Couverture 100 % et MSI ≥ 80 % du domaine imposés en CI
-- [ ] Application : cas d'usage `BookAppointment`, `ConfirmAppointment`, `CancelAppointment`, `ListAvailableSlots` (CQRS via Messenger)
-- [ ] Prestataire (`Provider`) : horaires et stratégie de créneaux
-- [ ] Infrastructure : dépôts Doctrine + en mémoire, suite de tests de contrat commune
+- [x] Application : commandes `RegisterProvider`, `BookAppointment`, `ConfirmAppointment`, `CancelAppointment` ; requêtes `ListAvailableSlots`, `GetAppointment`, `ListAppointments`
+- [x] Prestataire (`Provider`) : horaires, durée, battement, délai de prévenance
+- [x] Dépôts en mémoire + suite de tests de contrat commune
+- [ ] Infrastructure : bus Messenger (commandes / requêtes), dépôts Doctrine soumis à la suite de contrat, horloge et UUID
 - [ ] API HTTP (JSON) et traduction des erreurs métier en 4xx
 - [ ] Front : réservation (choix du jour, créneaux, formulaire) et agenda du prestataire
 - [ ] Notifications par e-mail sur les Domain Events
@@ -30,4 +31,5 @@ Déploiement automatisé, sauvegardes, supervision.
 
 ## Défauts connus
 
-_Aucun pour l'instant._
+- **Double réservation concurrente** : deux requêtes simultanées peuvent passer la règle « déjà réservé » avant l'enregistrement. À couvrir côté base (contrainte d'exclusion PostgreSQL sur la plage horaire) lors de l'adapter Doctrine.
+- **Fuseaux horaires** : les horaires d'ouverture sont interprétés dans le fuseau des dates reçues. Ajouter un fuseau par prestataire avant l'essai réel.
