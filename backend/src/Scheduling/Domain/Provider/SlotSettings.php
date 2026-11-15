@@ -10,17 +10,18 @@ use App\Scheduling\Domain\Exception\InvalidProvider;
 
 /**
  * Value Object : réglages de prise de rendez-vous d'un prestataire.
+ *
+ * Seules les valeurs scalaires sont stockées : la persistance reconstruit l'objet
+ * sans passer par le constructeur, la stratégie est donc recalculée à la demande.
  */
 final readonly class SlotSettings
 {
-    private FixedIntervalStrategy $strategy;
-
     public function __construct(
         public int $durationMinutes,
         public int $bufferMinutes = 0,
         public int $minimumNoticeMinutes = 0,
     ) {
-        $this->strategy = new FixedIntervalStrategy($durationMinutes, $bufferMinutes);
+        $this->strategy();
         if ($minimumNoticeMinutes < 0) {
             throw InvalidProvider::negativeNotice($minimumNoticeMinutes);
         }
@@ -28,6 +29,6 @@ final readonly class SlotSettings
 
     public function strategy(): SlotGenerationStrategy
     {
-        return $this->strategy;
+        return new FixedIntervalStrategy($this->durationMinutes, $this->bufferMinutes);
     }
 }
