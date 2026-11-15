@@ -29,6 +29,22 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    services:
+      db:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: planner
+          POSTGRES_PASSWORD: planner
+          POSTGRES_DB: planner
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U planner"
+          --health-interval 5s
+          --health-retries 10
+    env:
+      # Base jetable du conteneur CI : identifiants sans valeur hors de ce job.
+      DATABASE_URL: postgresql://planner:planner@127.0.0.1:5432/planner?serverVersion=17&charset=utf8
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -39,6 +55,12 @@ jobs:
       - run: composer install --no-interaction --no-progress
       - run: vendor/bin/php-cs-fixer check --diff
       - run: vendor/bin/phpstan analyse --no-progress
+      - name: Base de test et migrations
+        run: |
+          bin/console doctrine:database:create --env=test --if-not-exists
+          bin/console doctrine:migrations:migrate --env=test --no-interaction
+      - name: Mapping et schéma synchronisés
+        run: bin/console doctrine:schema:validate --env=test
       - name: Tests et couverture
         run: vendor/bin/phpunit --coverage-clover var/coverage/clover.xml
       - name: Couverture domaine + application = 100 %
