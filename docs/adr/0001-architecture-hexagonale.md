@@ -42,4 +42,4 @@ Le backend est découpé par contexte métier (`Scheduling`, plus tard `Identity
 ## Conséquences
 
 - Plus de classes qu'un CRUD Symfony classique, en échange d'un domaine testable en millisecondes.
-- Le mapping Doctrine XML est plus verbeux que les attributs.
+- Le mapping Doctrine XML est plus verbeux que les attributs (voir ADR 0003).
