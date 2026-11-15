@@ -9,6 +9,8 @@ use App\Scheduling\Domain\Appointment\AppointmentId;
 use App\Scheduling\Domain\Appointment\AppointmentRepository;
 use App\Scheduling\Domain\Availability\TimeSlot;
 use App\Scheduling\Domain\Exception\AppointmentNotFound;
+use App\Scheduling\Domain\Exception\SlotUnavailable;
+use App\Scheduling\Domain\Provider\Provider;
 use App\Scheduling\Domain\ProviderId;
 
 /**
@@ -21,6 +23,9 @@ final class InMemoryAppointmentRepository implements AppointmentRepository
 
     public function save(Appointment $appointment): void
     {
+        if ($this->conflictsWithAnother($appointment)) {
+            throw SlotUnavailable::because([Provider::RULE_ALREADY_TAKEN]);
+        }
         $copy = clone $appointment;
         $copy->pullDomainEvents();
         $this->appointments[$appointment->id()->value] = $copy;
@@ -42,5 +47,23 @@ final class InMemoryAppointmentRepository implements AppointmentRepository
         usort($matching, static fn (Appointment $a, Appointment $b): int => $a->slot()->start <=> $b->slot()->start);
 
         return $matching;
+    }
+
+    /** Équivalent de la contrainte d'exclusion PostgreSQL de l'adapter Doctrine. */
+    private function conflictsWithAnother(Appointment $appointment): bool
+    {
+        if (!$appointment->blocksSlot()) {
+            return false;
+        }
+        foreach ($this->appointments as $other) {
+            if (!$other->id()->equals($appointment->id())
+                && $other->blocksSlot()
+                && $other->providerId()->equals($appointment->providerId())
+                && $other->slot()->overlaps($appointment->slot())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

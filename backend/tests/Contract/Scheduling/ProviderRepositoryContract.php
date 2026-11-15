@@ -8,16 +8,18 @@ use App\Scheduling\Domain\Exception\ProviderNotFound;
 use App\Scheduling\Domain\Provider\ProviderRepository;
 use App\Scheduling\Domain\ProviderId;
 use App\Tests\Fixture\ProviderMother;
-use PHPUnit\Framework\TestCase;
 
-abstract class ProviderRepositoryContract extends TestCase
+trait ProviderRepositoryContract
 {
     abstract protected function repository(): ProviderRepository;
+
+    abstract protected function clear(): void;
 
     public function testSavedProviderCanBeRetrieved(): void
     {
         $repository = $this->repository();
         $repository->save(ProviderMother::doctor('p1', 45));
+        $this->clear();
 
         $found = $repository->get(new ProviderId('p1'));
 
@@ -30,6 +32,7 @@ abstract class ProviderRepositoryContract extends TestCase
         self::assertSame(1, $found->schedule()->openingHours[0]->weekday);
         self::assertSame('09:00', $found->schedule()->openingHours[0]->opensAt());
         self::assertSame('12:00', $found->schedule()->openingHours[0]->closesAt());
+        self::assertCount(6, $found->settings()->strategy()->generate($found->schedule()->windowsOn(new \DateTimeImmutable(ProviderMother::MONDAY))[0]));
     }
 
     public function testUnknownProviderThrows(): void
