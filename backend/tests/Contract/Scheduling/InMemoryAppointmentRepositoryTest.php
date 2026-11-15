@@ -6,11 +6,25 @@ namespace App\Tests\Contract\Scheduling;
 
 use App\Scheduling\Domain\Appointment\AppointmentRepository;
 use App\Scheduling\Infrastructure\Persistence\InMemory\InMemoryAppointmentRepository;
+use PHPUnit\Framework\TestCase;
 
-final class InMemoryAppointmentRepositoryTest extends AppointmentRepositoryContract
+final class InMemoryAppointmentRepositoryTest extends TestCase
 {
+    use AppointmentRepositoryContract;
+
+    private InMemoryAppointmentRepository $repository;
+
+    protected function setUp(): void
+    {
+        $this->repository = new InMemoryAppointmentRepository();
+    }
+
     protected function repository(): AppointmentRepository
     {
-        return new InMemoryAppointmentRepository();
+        return $this->repository;
+    }
+
+    protected function clear(): void
+    {
     }
 }

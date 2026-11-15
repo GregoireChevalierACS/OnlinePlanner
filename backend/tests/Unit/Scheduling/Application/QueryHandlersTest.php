@@ -77,7 +77,7 @@ final class QueryHandlersTest extends TestCase
 
     public function testListAppointmentsCoversWholeDaysInclusive(): void
     {
-        $this->appointments->save(AppointmentMother::booked('before', '2026-01-04 23:30'));
+        $this->appointments->save(AppointmentMother::booked('before', '2026-01-04 23:00'));
         $this->appointments->save(AppointmentMother::booked('first', '2026-01-04 23:59', 'p1', 2));
         $this->appointments->save(AppointmentMother::booked('last', '2026-01-06 23:59', 'p1', 1));
         $this->appointments->save(AppointmentMother::booked('after', '2026-01-07 00:00'));
