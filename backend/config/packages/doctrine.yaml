@@ -1,6 +1,11 @@
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
+        types:
+            appointment_id: App\Scheduling\Infrastructure\Persistence\Doctrine\Type\AppointmentIdType
+            provider_id: App\Scheduling\Infrastructure\Persistence\Doctrine\Type\ProviderIdType
+            appointment_status: App\Scheduling\Infrastructure\Persistence\Doctrine\Type\AppointmentStatusType
+            weekly_schedule: App\Scheduling\Infrastructure\Persistence\Doctrine\Type\WeeklyScheduleType
 
         # IMPORTANT: You MUST configure your server version,
         # either here or in the DATABASE_URL env var (see .env file)
@@ -14,11 +19,12 @@ doctrine:
             Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
         auto_mapping: true
         mappings:
-            App:
-                type: attribute
+            # Mapping XML hors du domaine : les classes métier ne portent aucun attribut Doctrine (ADR 0001).
+            Scheduling:
+                type: xml
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
+                dir: '%kernel.project_dir%/src/Scheduling/Infrastructure/Persistence/Doctrine/Mapping'
+                prefix: 'App\Scheduling\Domain'
 
 when@test:
     doctrine:
