@@ -24,6 +24,9 @@
         <testsuite name="contract">
             <directory>tests/Contract</directory>
         </testsuite>
+        <testsuite name="integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
         <testsuite name="smoke">
             <directory>tests/Smoke</directory>
         </testsuite>
@@ -46,5 +49,6 @@
     </source>
 
     <extensions>
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />
     </extensions>
 </phpunit>
