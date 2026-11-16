@@ -84,5 +84,6 @@ jobs:
       - run: npx oxlint . && npx eslint .
       - run: npx prettier --check src/
       - run: npm run type-check
-      - run: npx vitest run
+      - name: Tests et couverture (100 % sur api, stores, composables)
+        run: npx vitest run --coverage
       - run: npm run build-only
