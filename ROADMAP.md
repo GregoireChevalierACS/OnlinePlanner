@@ -11,7 +11,7 @@
 - [x] Dépôts en mémoire + suite de tests de contrat commune
 - [x] Infrastructure : bus Messenger (commandes, requêtes, événements), dépôts Doctrine soumis à la suite de contrat, horloge et UUID v7
 - [x] API HTTP (JSON) et traduction des erreurs métier en 4xx (`problem+json`), voir `docs/api.md`
-- [ ] Front : réservation (choix du jour, créneaux, formulaire) et agenda du prestataire
+- [x] Front : création d'agenda, réservation (jour, créneaux, formulaire) et agenda du prestataire (confirmation, annulation avec motif), voir ADR 0004
 - [ ] Notifications par e-mail sur les Domain Events
 - [ ] Authentification du prestataire
 
@@ -32,3 +32,4 @@ Déploiement automatisé, sauvegardes, supervision.
 ## Défauts connus
 
 - **Fuseaux horaires** : les horaires d'ouverture sont interprétés dans le fuseau des dates reçues. Ajouter un fuseau par prestataire avant l'essai réel.
+- **Agenda non protégé** : quiconque connaît l'identifiant d'un prestataire peut voir, confirmer et annuler ses rendez-vous. Bloquant avant l'essai réel (authentification).
