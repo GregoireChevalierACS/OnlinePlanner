@@ -1,35 +1,263 @@
-@import './base.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --text: #1d2330;
+  --muted: #5f6b7a;
+  --border: #d8dde4;
+  --primary: #2453d4;
+  --primary-text: #ffffff;
+  --danger: #b42318;
+  --success-bg: #e7f6ec;
+  --success-text: #1a6b35;
+  --alert-bg: #fdecea;
+  --radius: 8px;
+  color-scheme: light;
 }
 
-a,
-.green {
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12151b;
+    --surface: #1b2029;
+    --text: #e6e9ef;
+    --muted: #9aa5b4;
+    --border: #2e3542;
+    --primary: #6b8fff;
+    --primary-text: #0b1020;
+    --danger: #ff7b6e;
+    --success-bg: #163222;
+    --success-text: #8fe0ab;
+    --alert-bg: #3a1c1a;
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    16px/1.5 system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+}
+
+a {
+  color: var(--primary);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.brand {
+  font-weight: 700;
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 1.1rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.form,
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form {
+  gap: 1rem;
+}
+
+.inline,
+.inline-form {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inline-form input {
+  flex: 1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+fieldset {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.day-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+input {
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+
+button.danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.slot[aria-pressed='true'] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+
+.alert {
+  background: var(--alert-bg);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+
+.alert-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.success {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+}
+
+.appointments {
+  list-style: none;
+  padding: 0;
+}
+
+.appointment {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.appointment.cancelled .time,
+.appointment.cancelled .who {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.appointment .actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .appointment {
+    grid-template-columns: 1fr auto;
   }
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+.backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 45%);
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+.dialog {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  max-width: 420px;
+  width: 100%;
+}
+
+.dialog .actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
