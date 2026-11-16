@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Scheduling\Domain\Exception;
 
-use App\Shared\Domain\DomainException;
+use App\Shared\Domain\Conflict;
 
-final class InvalidStatusTransition extends DomainException
+final class InvalidStatusTransition extends Conflict
 {
     public static function from(string $status, string $action): self
     {
