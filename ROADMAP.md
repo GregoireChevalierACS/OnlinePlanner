@@ -10,7 +10,7 @@
 - [x] Prestataire (`Provider`) : horaires, durée, battement, délai de prévenance
 - [x] Dépôts en mémoire + suite de tests de contrat commune
 - [x] Infrastructure : bus Messenger (commandes, requêtes, événements), dépôts Doctrine soumis à la suite de contrat, horloge et UUID v7
-- [ ] API HTTP (JSON) et traduction des erreurs métier en 4xx
+- [x] API HTTP (JSON) et traduction des erreurs métier en 4xx (`problem+json`), voir `docs/api.md`
 - [ ] Front : réservation (choix du jour, créneaux, formulaire) et agenda du prestataire
 - [ ] Notifications par e-mail sur les Domain Events
 - [ ] Authentification du prestataire

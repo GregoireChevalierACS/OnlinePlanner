@@ -37,6 +37,8 @@ Le backend est découpé par contexte métier (`Scheduling`, plus tard `Identity
 | Repository | `AppointmentRepository`, `ProviderRepository` (ports du domaine), adapters en mémoire | Persistance interchangeable, vérifiée par une suite de contrat commune |
 | Command / Query (CQRS) | `Scheduling/Application/Command`, `Query` | Écritures et lectures séparées ; une commande ne renvoie rien (l'identifiant est créé par l'appelant) |
 | DTO de lecture | `SlotView`, `AppointmentView` | Le domaine n'est jamais exposé à l'interface |
+| DTO d'entrée + contrôleur fin | `Infrastructure/Http/Request`, `Infrastructure/Http/Controller` | La forme de la requête est validée à la frontière ; le contrôleur ne fait qu'envoyer une commande ou une requête |
+| Hiérarchie d'exceptions métier | `NotFound`, `Conflict`, `DomainException` (`Shared/Domain`) | Un seul écouteur HTTP traduit toutes les erreurs (404 / 409 / 422) sans connaître les contextes métier |
 | Object Mother | `tests/Fixture` | Jeux de données de test lisibles et réutilisés |
 
 ## Conséquences
