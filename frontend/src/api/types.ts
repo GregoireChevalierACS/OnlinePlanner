@@ -1,5 +1,15 @@
 /** Contrats JSON de l'API (voir docs/api.md). */
 
+export interface Account {
+  id: string
+  email: string
+}
+
+export interface ProviderSummary {
+  id: string
+  name: string
+}
+
 export interface Slot {
   startsAt: string
   endsAt: string

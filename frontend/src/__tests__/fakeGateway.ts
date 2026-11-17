@@ -1,12 +1,14 @@
 import { vi } from 'vitest'
 import { createApp } from 'vue'
 import { createPinia, setActivePinia, type Pinia } from 'pinia'
+import { authGatewayKey, type AuthGateway } from '@/api/AuthGateway'
 import { schedulingGatewayKey, type SchedulingGateway } from '@/api/SchedulingGateway'
 import type { Appointment, Slot } from '@/api/types'
 
 /** Double de test du port : chaque méthode est un espion configurable. */
 export function fakeGateway() {
   return {
+    myProviders: vi.fn<SchedulingGateway['myProviders']>().mockResolvedValue([]),
     registerProvider: vi.fn<SchedulingGateway['registerProvider']>().mockResolvedValue('p1'),
     availableSlots: vi.fn<SchedulingGateway['availableSlots']>().mockResolvedValue([]),
     book: vi.fn<SchedulingGateway['book']>().mockResolvedValue('a1'),
@@ -16,13 +18,26 @@ export function fakeGateway() {
   } satisfies SchedulingGateway
 }
 
-/** Exécute `fn` dans une application Vue qui fournit le gateway (comme main.ts). */
+export const account = { id: 'acc-1', email: 'jane@example.com' }
+
+export function fakeAuthGateway() {
+  return {
+    currentAccount: vi.fn<AuthGateway['currentAccount']>().mockResolvedValue(null),
+    login: vi.fn<AuthGateway['login']>().mockResolvedValue(account),
+    register: vi.fn<AuthGateway['register']>().mockResolvedValue(account),
+    logout: vi.fn<AuthGateway['logout']>().mockResolvedValue(undefined),
+  } satisfies AuthGateway
+}
+
+/** Exécute `fn` dans une application Vue qui fournit les gateways (comme main.ts). */
 export function withGateway<T>(
   gateway: SchedulingGateway,
   fn: () => T,
+  auth: AuthGateway = fakeAuthGateway(),
 ): { result: T; pinia: Pinia } {
   const app = createApp({})
   app.provide(schedulingGatewayKey, gateway)
+  app.provide(authGatewayKey, auth)
   const pinia = createPinia()
   app.use(pinia)
   setActivePinia(pinia)

@@ -20,6 +20,8 @@ export class HttpClient {
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
       signal,
+      // Envoie le cookie de session, y compris si l'API est sur une autre origine (VITE_API_URL).
+      credentials: 'include',
     })
 
     if (!response.ok) {
