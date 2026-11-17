@@ -13,7 +13,8 @@
 - [x] API HTTP (JSON) et traduction des erreurs métier en 4xx (`problem+json`), voir `docs/api.md`
 - [x] Front : création d'agenda, réservation (jour, créneaux, formulaire) et agenda du prestataire (confirmation, annulation avec motif), voir ADR 0004
 - [ ] Notifications par e-mail sur les Domain Events
-- [ ] Authentification du prestataire
+- [x] Authentification du prestataire : comptes, session par cookie, propriété des agendas (ADR 0005)
+- [ ] Réinitialisation du mot de passe et vérification de l'adresse e-mail (après les e-mails)
 
 **Terminée quand :** la CI est verte avec couverture 100 % et MSI ≥ 80 % sur domaine et application, et un rendez-vous peut être réservé, confirmé et annulé de bout en bout via le front.
 
@@ -32,4 +33,4 @@ Déploiement automatisé, sauvegardes, supervision.
 ## Défauts connus
 
 - **Fuseaux horaires** : les horaires d'ouverture sont interprétés dans le fuseau des dates reçues. Ajouter un fuseau par prestataire avant l'essai réel.
-- **Agenda non protégé** : quiconque connaît l'identifiant d'un prestataire peut voir, confirmer et annuler ses rendez-vous. Bloquant avant l'essai réel (authentification).
+- **Mot de passe oublié** : aucun moyen de récupérer un compte sans e-mail de réinitialisation. À livrer avec les notifications.
