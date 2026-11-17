@@ -13,6 +13,7 @@ final readonly class RegisterProvider implements Command
      */
     public function __construct(
         public string $providerId,
+        public string $ownerId,
         public string $name,
         public array $openingHours,
         public int $slotDurationMinutes,

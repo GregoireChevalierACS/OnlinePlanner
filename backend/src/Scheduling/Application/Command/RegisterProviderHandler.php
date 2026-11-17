@@ -6,6 +6,7 @@ namespace App\Scheduling\Application\Command;
 
 use App\Scheduling\Domain\Availability\OpeningHours;
 use App\Scheduling\Domain\Availability\WeeklySchedule;
+use App\Scheduling\Domain\Provider\OwnerId;
 use App\Scheduling\Domain\Provider\Provider;
 use App\Scheduling\Domain\Provider\ProviderRepository;
 use App\Scheduling\Domain\Provider\SlotSettings;
@@ -27,6 +28,7 @@ final readonly class RegisterProviderHandler implements CommandHandler
 
         $this->providers->save(Provider::register(
             new ProviderId($command->providerId),
+            new OwnerId($command->ownerId),
             $command->name,
             $schedule,
             new SlotSettings($command->slotDurationMinutes, $command->bufferMinutes, $command->minimumNoticeMinutes),

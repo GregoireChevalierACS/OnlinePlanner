@@ -10,6 +10,7 @@ use App\Scheduling\Domain\Availability\TimeSlot;
 use App\Scheduling\Domain\Availability\WeeklySchedule;
 use App\Scheduling\Domain\Exception\InvalidProvider;
 use App\Scheduling\Domain\Exception\InvalidSlotStrategy;
+use App\Scheduling\Domain\Provider\OwnerId;
 use App\Scheduling\Domain\Provider\Provider;
 use App\Scheduling\Domain\Provider\SlotSettings;
 use App\Scheduling\Domain\ProviderId;
@@ -25,9 +26,10 @@ final class ProviderTest extends TestCase
         $schedule = new WeeklySchedule(OpeningHours::on(1, '09:00', '12:00'));
         $settings = new SlotSettings(30);
 
-        $provider = Provider::register(new ProviderId('p1'), '  Dr Martin ', $schedule, $settings);
+        $provider = Provider::register(new ProviderId('p1'), new OwnerId('owner-1'), '  Dr Martin ', $schedule, $settings);
 
         self::assertSame('p1', $provider->id()->value);
+        self::assertSame('owner-1', $provider->ownerId()->value);
         self::assertSame('Dr Martin', $provider->name());
         self::assertSame($schedule, $provider->schedule());
         self::assertSame($settings, $provider->settings());
@@ -38,7 +40,15 @@ final class ProviderTest extends TestCase
         $this->expectException(InvalidProvider::class);
         $this->expectExceptionMessage('Le nom du prestataire est obligatoire.');
 
-        Provider::register(new ProviderId('p1'), ' ', new WeeklySchedule(), new SlotSettings(30));
+        Provider::register(new ProviderId('p1'), new OwnerId('owner-1'), ' ', new WeeklySchedule(), new SlotSettings(30));
+    }
+
+    public function testOnlyTheOwnerManagesTheSchedule(): void
+    {
+        $provider = ProviderMother::doctor(ownerId: 'owner-1');
+
+        self::assertTrue($provider->isManagedBy(new OwnerId('owner-1')));
+        self::assertFalse($provider->isManagedBy(new OwnerId('owner-2')));
     }
 
     public function testSlotStartingAtUsesConfiguredDuration(): void

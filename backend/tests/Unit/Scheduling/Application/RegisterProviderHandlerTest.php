@@ -18,6 +18,7 @@ final class RegisterProviderHandlerTest extends TestCase
 
         (new RegisterProviderHandler($providers))(new RegisterProvider(
             'p1',
+            'owner-1',
             'Dr Martin',
             [
                 ['weekday' => 2, 'opensAt' => '14:00', 'closesAt' => '18:00'],
@@ -30,6 +31,7 @@ final class RegisterProviderHandlerTest extends TestCase
 
         $provider = $providers->get(new ProviderId('p1'));
         self::assertSame('Dr Martin', $provider->name());
+        self::assertSame('owner-1', $provider->ownerId()->value);
         self::assertSame(20, $provider->settings()->durationMinutes);
         self::assertSame(5, $provider->settings()->bufferMinutes);
         self::assertSame(120, $provider->settings()->minimumNoticeMinutes);
@@ -44,7 +46,7 @@ final class RegisterProviderHandlerTest extends TestCase
 
     public function testDefaults(): void
     {
-        $command = new RegisterProvider('p1', 'Dr Martin', [], 30);
+        $command = new RegisterProvider('p1', 'owner-1', 'Dr Martin', [], 30);
 
         self::assertSame(0, $command->bufferMinutes);
         self::assertSame(0, $command->minimumNoticeMinutes);
