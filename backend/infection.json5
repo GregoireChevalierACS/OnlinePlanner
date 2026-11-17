@@ -2,7 +2,7 @@
     "$schema": "vendor/infection/infection/resources/schema.json",
     // Tests de mutation sur le domaine et la couche application (cf. bonnes-pratiques.md : score >= 80 %)
     "source": {
-        "directories": ["src/Shared/Domain", "src/Shared/Application", "src/Scheduling/Domain", "src/Scheduling/Application"]
+        "directories": ["src/Shared/Domain", "src/Shared/Application", "src/Scheduling/Domain", "src/Scheduling/Application", "src/Identity/Domain", "src/Identity/Application"]
     },
     "minMsi": 80,
     "minCoveredMsi": 80,
