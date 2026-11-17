@@ -1,19 +1,33 @@
 <script setup lang="ts">
-import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const router = useRouter()
+const auth = useAuthStore()
+
+async function logout(): Promise<void> {
+  await auth.logout()
+  await router.push({ name: 'login' })
+}
 </script>
 
 <template>
   <header class="topbar">
     <RouterLink to="/" class="brand">OnlinePlanner</RouterLink>
-    <nav v-if="typeof route.params.providerId === 'string'">
-      <RouterLink :to="{ name: 'agenda', params: { providerId: route.params.providerId } }"
-        >Agenda</RouterLink
-      >
-      <RouterLink :to="{ name: 'booking', params: { providerId: route.params.providerId } }"
-        >Réservation</RouterLink
-      >
+    <nav>
+      <template v-if="typeof route.params.providerId === 'string' && auth.isAuthenticated">
+        <RouterLink :to="{ name: 'agenda', params: { providerId: route.params.providerId } }">
+          Agenda
+        </RouterLink>
+        <RouterLink :to="{ name: 'booking', params: { providerId: route.params.providerId } }">
+          Réservation
+        </RouterLink>
+      </template>
+      <template v-if="auth.account">
+        <span class="muted">{{ auth.account.email }}</span>
+        <button type="button" @click="logout">Se déconnecter</button>
+      </template>
     </nav>
   </header>
 

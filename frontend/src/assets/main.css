@@ -261,3 +261,25 @@ button.danger {
   gap: 0.5rem;
   margin-top: 1rem;
 }
+
+.narrow {
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+button.link {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.providers {
+  padding-left: 1.25rem;
+}
+
+.topbar nav {
+  align-items: center;
+  flex-wrap: wrap;
+}
