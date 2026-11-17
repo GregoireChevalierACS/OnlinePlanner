@@ -18,4 +18,9 @@ interface ProviderRepository
      * @throws ProviderNotFound
      */
     public function get(ProviderId $id): Provider;
+
+    /**
+     * @return list<Provider> les agendas gérés par ce compte, triés par nom
+     */
+    public function ownedBy(OwnerId $ownerId): array;
 }

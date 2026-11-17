@@ -28,20 +28,32 @@ final class Provider extends AggregateRoot
 
     private function __construct(
         private readonly ProviderId $id,
+        private readonly OwnerId $ownerId,
         private readonly string $name,
         private readonly WeeklySchedule $schedule,
         private readonly SlotSettings $settings,
     ) {
     }
 
-    public static function register(ProviderId $id, string $name, WeeklySchedule $schedule, SlotSettings $settings): self
+    public static function register(ProviderId $id, OwnerId $ownerId, string $name, WeeklySchedule $schedule, SlotSettings $settings): self
     {
         $trimmed = trim($name);
         if ('' === $trimmed) {
             throw InvalidProvider::emptyName();
         }
 
-        return new self($id, $trimmed, $schedule, $settings);
+        return new self($id, $ownerId, $trimmed, $schedule, $settings);
+    }
+
+    /** Seul le propriétaire gère l'agenda (voir, confirmer, annuler). */
+    public function isManagedBy(OwnerId $ownerId): bool
+    {
+        return $this->ownerId->equals($ownerId);
+    }
+
+    public function ownerId(): OwnerId
+    {
+        return $this->ownerId;
     }
 
     /**

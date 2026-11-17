@@ -44,6 +44,7 @@ final class BookingWorkflowTest extends KernelTestCase
 
         $this->commands->dispatch(new RegisterProvider(
             'p1',
+            'owner-1',
             'Dr Martin',
             [['weekday' => 1, 'opensAt' => '09:00', 'closesAt' => '10:00']],
             30,

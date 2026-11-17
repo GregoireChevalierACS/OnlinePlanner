@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Contract\Scheduling;
 
 use App\Scheduling\Domain\Exception\ProviderNotFound;
+use App\Scheduling\Domain\Provider\OwnerId;
 use App\Scheduling\Domain\Provider\ProviderRepository;
 use App\Scheduling\Domain\ProviderId;
 use App\Tests\Fixture\ProviderMother;
@@ -41,5 +42,20 @@ trait ProviderRepositoryContract
         $this->expectExceptionMessage('Prestataire « inconnu » introuvable.');
 
         $this->repository()->get(new ProviderId('inconnu'));
+    }
+
+    public function testOwnedByListsOnlyTheOwnersProvidersSortedByName(): void
+    {
+        $repository = $this->repository();
+        $repository->save(ProviderMother::doctor('p1', ownerId: 'owner-1', name: 'Salle B'));
+        $repository->save(ProviderMother::doctor('p2', ownerId: 'owner-2', name: 'Autre compte'));
+        $repository->save(ProviderMother::doctor('p3', ownerId: 'owner-1', name: 'Cabinet A'));
+        $this->clear();
+
+        $owned = $repository->ownedBy(new OwnerId('owner-1'));
+
+        self::assertSame(['p3', 'p1'], array_map(static fn ($p): string => $p->id()->value, $owned));
+        self::assertSame('owner-1', $owned[0]->ownerId()->value);
+        self::assertSame([], $repository->ownedBy(new OwnerId('personne')));
     }
 }
