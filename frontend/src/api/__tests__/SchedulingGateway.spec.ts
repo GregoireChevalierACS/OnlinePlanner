@@ -24,6 +24,13 @@ const call = (fetchFn: ReturnType<typeof vi.fn<typeof fetch>>) => {
 }
 
 describe('HttpSchedulingGateway', () => {
+  it('liste les agendas du compte connecté', async () => {
+    const { gateway, fetchFn } = gatewayReturning([{ id: 'p1', name: 'Cabinet' }])
+
+    await expect(gateway.myProviders()).resolves.toEqual([{ id: 'p1', name: 'Cabinet' }])
+    expect(call(fetchFn)).toMatchObject({ url: '/api/providers', method: 'GET' })
+  })
+
   it('inscrit un prestataire', async () => {
     const { gateway, fetchFn } = gatewayReturning({ id: 'p1' }, 201)
     const provider = {

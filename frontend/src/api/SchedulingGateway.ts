@@ -1,13 +1,15 @@
 import type { InjectionKey } from 'vue'
 import { inject } from 'vue'
 import type { HttpClient } from './HttpClient'
-import type { Appointment, NewAppointment, NewProvider, Slot } from './types'
+import type { Appointment, NewAppointment, NewProvider, ProviderSummary, Slot } from './types'
 
 /**
  * Port : ce dont l'interface a besoin, sans savoir comment on parle au serveur.
  * Les stores et les vues ne dépendent que de cette interface (injectée par Vue).
  */
 export interface SchedulingGateway {
+  /** Agendas gérés par le compte connecté. */
+  myProviders(): Promise<ProviderSummary[]>
   registerProvider(provider: NewProvider): Promise<string>
   availableSlots(providerId: string, date: string, signal?: AbortSignal): Promise<Slot[]>
   book(providerId: string, appointment: NewAppointment): Promise<string>
@@ -31,6 +33,10 @@ export function useSchedulingGateway(): SchedulingGateway {
 /** Adapter HTTP du port, sur l'API Symfony. */
 export class HttpSchedulingGateway implements SchedulingGateway {
   constructor(private readonly http: HttpClient) {}
+
+  myProviders(): Promise<ProviderSummary[]> {
+    return this.http.request('GET', '/api/providers')
+  }
 
   async registerProvider(provider: NewProvider): Promise<string> {
     return (await this.http.request<{ id: string }>('POST', '/api/providers', provider)).id

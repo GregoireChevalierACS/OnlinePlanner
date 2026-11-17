@@ -27,6 +27,7 @@ describe('HttpClient', () => {
       headers: { Accept: 'application/json' },
       body: undefined,
       signal,
+      credentials: 'include',
     })
   })
 
@@ -40,6 +41,7 @@ describe('HttpClient', () => {
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
       body: '{"a":1}',
       signal: undefined,
+      credentials: 'include',
     })
   })
 
