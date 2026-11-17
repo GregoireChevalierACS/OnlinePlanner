@@ -21,6 +21,39 @@ final class SchedulingApiTest extends WebTestCase
     {
         $this->client = self::createClient();
         self::mockTime('2026-01-05 07:00');
+        $this->signUp('owner@example.com');
+    }
+
+    public function testOnlyTheOwnerManagesTheSchedule(): void
+    {
+        $providerId = $this->registerProvider();
+        $this->post("/api/providers/{$providerId}/appointments", ['startsAt' => '2026-01-05T09:00:00', 'customerName' => 'Jane', 'customerEmail' => 'jane@example.com']);
+        $appointmentId = self::text($this->json(), 'id');
+
+        $this->post('/api/auth/logout');
+        self::assertResponseStatusCodeSame(204);
+        $this->get("/api/providers/{$providerId}/appointments?from=2026-01-05&to=2026-01-05");
+        self::assertResponseStatusCodeSame(401);
+        self::assertResponseHeaderSame('Content-Type', 'application/problem+json');
+        $this->post("/api/appointments/{$appointmentId}/cancel", ['reason' => 'x']);
+        self::assertResponseStatusCodeSame(401);
+        self::assertSame(['09:30'], $this->availableStarts($providerId), 'la réservation reste publique');
+
+        $this->signUp('intrus@example.com');
+        $this->get("/api/providers/{$providerId}/appointments?from=2026-01-05&to=2026-01-05");
+        self::assertResponseStatusCodeSame(403);
+        $this->get("/api/appointments/{$appointmentId}");
+        self::assertResponseStatusCodeSame(403);
+        $this->post("/api/appointments/{$appointmentId}/confirm");
+        self::assertResponseStatusCodeSame(403);
+        self::assertSame([], $this->get('/api/providers'));
+    }
+
+    public function testListsTheAccountsProviders(): void
+    {
+        $providerId = $this->registerProvider();
+
+        self::assertSame([['id' => $providerId, 'name' => 'Dr Martin']], $this->get('/api/providers'));
     }
 
     public function testFullBookingJourney(): void
@@ -145,6 +178,13 @@ final class SchedulingApiTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(404);
         self::assertResponseHeaderSame('Content-Type', 'text/html; charset=UTF-8');
+    }
+
+    /** Crée un compte : l'API connecte aussitôt le client (cookie de session). */
+    private function signUp(string $email): void
+    {
+        $this->post('/api/auth/register', ['email' => $email, 'password' => 'un mot de passe solide']);
+        self::assertResponseStatusCodeSame(201);
     }
 
     private function registerProvider(): string
