@@ -1,0 +1,49 @@
+security:
+    password_hashers:
+        App\Identity\Infrastructure\Security\SecurityUser: 'auto'
+
+    providers:
+        accounts:
+            id: App\Identity\Infrastructure\Security\AccountUserProvider
+
+    firewalls:
+        dev:
+            # Ensure dev tools and static assets are always allowed
+            pattern: ^/(_profiler(/|$)|(_wdt|assets|build)/)
+            security: false
+        main:
+            lazy: true
+            provider: accounts
+            # Session par cookie HttpOnly, SameSite=Lax (défaut Symfony) : le navigateur ne l'envoie pas
+            # sur une requête POST venue d'un autre site, ce qui protège les actions d'écriture.
+            json_login:
+                check_path: api_auth_login
+                username_path: email
+                password_path: password
+                failure_handler: App\Identity\Infrastructure\Http\LoginFailureHandler
+            # Freine les essais de mots de passe : 5 tentatives par adresse et par IP sur 15 minutes.
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
+            logout:
+                path: api_auth_logout
+
+    # Seule la première règle correspondante s'applique.
+    access_control:
+        - { path: ^/api/auth/(login|register)$, roles: PUBLIC_ACCESS }
+        # Parcours public de réservation : voir les créneaux et réserver.
+        - { path: ^/api/providers/[^/]+/slots$, methods: [GET], roles: PUBLIC_ACCESS }
+        - { path: ^/api/providers/[^/]+/appointments$, methods: [POST], roles: PUBLIC_ACCESS }
+        # Tout le reste de l'API est réservé aux prestataires connectés ; la propriété est vérifiée par ScheduleAccessVoter.
+        - { path: ^/api/, roles: ROLE_PROVIDER }
+
+when@test:
+    security:
+        password_hashers:
+            # Password hashers are resource-intensive by design to ensure security.
+            # In tests, it's safe to reduce their cost to improve performance.
+            App\Identity\Infrastructure\Security\SecurityUser:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon

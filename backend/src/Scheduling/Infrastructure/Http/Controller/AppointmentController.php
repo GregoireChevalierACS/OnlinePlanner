@@ -8,6 +8,7 @@ use App\Scheduling\Application\Command\CancelAppointment;
 use App\Scheduling\Application\Command\ConfirmAppointment;
 use App\Scheduling\Application\Query\GetAppointment;
 use App\Scheduling\Infrastructure\Http\Request\CancelAppointmentInput;
+use App\Scheduling\Infrastructure\Security\ScheduleAccessVoter;
 use App\Shared\Application\CommandBus;
 use App\Shared\Application\QueryBus;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,8 +16,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Détail, confirmation et annulation : réservés au propriétaire de l'agenda du rendez-vous.
+ */
 #[Route('/api/appointments/{appointmentId}', format: 'json')]
+#[IsGranted(ScheduleAccessVoter::MANAGE_APPOINTMENT, subject: 'appointmentId')]
 final class AppointmentController extends AbstractController
 {
     public function __construct(

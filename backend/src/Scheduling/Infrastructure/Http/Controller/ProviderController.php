@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Scheduling\Infrastructure\Http\Controller;
 
+use App\Identity\Infrastructure\Security\SecurityUser;
 use App\Scheduling\Application\Command\BookAppointment;
 use App\Scheduling\Application\Command\RegisterProvider;
 use App\Scheduling\Application\Query\ListAppointments;
 use App\Scheduling\Application\Query\ListAvailableSlots;
+use App\Scheduling\Application\Query\ListOwnedProviders;
 use App\Scheduling\Infrastructure\Http\Request\BookAppointmentInput;
 use App\Scheduling\Infrastructure\Http\Request\DayQuery;
 use App\Scheduling\Infrastructure\Http\Request\PeriodQuery;
 use App\Scheduling\Infrastructure\Http\Request\RegisterProviderInput;
+use App\Scheduling\Infrastructure\Security\ScheduleAccessVoter;
 use App\Shared\Application\CommandBus;
 use App\Shared\Application\IdGenerator;
 use App\Shared\Application\QueryBus;
@@ -21,6 +24,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Contrôleur fin : traduit HTTP en commandes / requêtes, sans aucune logique métier.
@@ -35,12 +40,19 @@ final class ProviderController extends AbstractController
     ) {
     }
 
+    #[Route('', name: 'provider_mine', methods: ['GET'])]
+    public function mine(#[CurrentUser] SecurityUser $user): JsonResponse
+    {
+        return $this->json($this->queries->ask(new ListOwnedProviders($user->id)));
+    }
+
     #[Route('', name: 'provider_register', methods: ['POST'])]
-    public function register(#[MapRequestPayload] RegisterProviderInput $input): JsonResponse
+    public function register(#[MapRequestPayload] RegisterProviderInput $input, #[CurrentUser] SecurityUser $user): JsonResponse
     {
         $id = $this->ids->next();
         $this->commands->dispatch(new RegisterProvider(
             $id,
+            $user->id,
             $input->name,
             $input->openingHoursAsArrays(),
             $input->slotDurationMinutes,
@@ -69,6 +81,7 @@ final class ProviderController extends AbstractController
     }
 
     #[Route('/{providerId}/appointments', name: 'provider_agenda', methods: ['GET'])]
+    #[IsGranted(ScheduleAccessVoter::MANAGE_PROVIDER, subject: 'providerId')]
     public function agenda(string $providerId, #[MapQueryString(validationFailedStatusCode: Response::HTTP_BAD_REQUEST)] PeriodQuery $query): JsonResponse
     {
         return $this->json($this->queries->ask(new ListAppointments($providerId, $query->fromDay(), $query->toDay())));
