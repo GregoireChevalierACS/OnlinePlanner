@@ -1,18 +1,26 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
 import { toProblem } from '@/api/ApiError'
 import { useSchedulingGateway } from '@/api/SchedulingGateway'
-import type { NewProvider, Problem } from '@/api/types'
+import type { NewProvider, Problem, ProviderSummary } from '@/api/types'
 import ProblemAlert from '@/components/ProblemAlert.vue'
 import ProviderForm from '@/components/ProviderForm.vue'
 
 const gateway = useSchedulingGateway()
 const router = useRouter()
 
+const providers = ref<ProviderSummary[]>([])
 const submitting = ref(false)
 const problem = ref<Problem | null>(null)
-const existingId = ref('')
+
+onMounted(async () => {
+  try {
+    providers.value = await gateway.myProviders()
+  } catch (error) {
+    problem.value = toProblem(error)
+  }
+})
 
 async function create(provider: NewProvider): Promise<void> {
   submitting.value = true
@@ -25,29 +33,24 @@ async function create(provider: NewProvider): Promise<void> {
   }
   submitting.value = false
 }
-
-function open(): void {
-  void router.push({ name: 'agenda', params: { providerId: existingId.value.trim() } })
-}
 </script>
 
 <template>
-  <section class="card">
-    <h1>Créer un agenda</h1>
-    <ProblemAlert v-if="problem" :problem="problem" />
-    <ProviderForm :disabled="submitting" @submit="create" />
+  <ProblemAlert v-if="problem" :problem="problem" />
+
+  <section v-if="providers.length > 0" class="card">
+    <h1>Mes agendas</h1>
+    <ul class="providers">
+      <li v-for="provider in providers" :key="provider.id">
+        <RouterLink :to="{ name: 'agenda', params: { providerId: provider.id } }">
+          {{ provider.name }}
+        </RouterLink>
+      </li>
+    </ul>
   </section>
 
   <section class="card">
-    <h2>Ouvrir un agenda existant</h2>
-    <form class="form inline-form" @submit.prevent="open">
-      <input
-        v-model="existingId"
-        name="providerId"
-        placeholder="Identifiant du prestataire"
-        required
-      />
-      <button type="submit">Ouvrir</button>
-    </form>
+    <h2>Créer un agenda</h2>
+    <ProviderForm :disabled="submitting" @submit="create" />
   </section>
 </template>
