@@ -1,0 +1,10 @@
+framework:
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+
+when@test:
+    framework:
+        mailer:
+            # Aucun envoi réel en test, quelle que soit la variable d'environnement : les e-mails sont
+            # seulement collectés (assertEmailCount, getMailerMessage…).
+            dsn: 'null://null'
