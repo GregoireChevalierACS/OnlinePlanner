@@ -1,6 +1,7 @@
 framework:
     messenger:
         default_bus: command.bus
+        failure_transport: failed
         buses:
             # Commandes : un handler par commande, chaque commande dans une transaction.
             command.bus:
@@ -16,3 +17,23 @@ framework:
 
         transports:
             sync: 'sync://'
+            # Les réactions aux événements (e-mails…) sont traitées par le worker : une panne du serveur
+            # d'e-mail ne fait jamais échouer une réservation, et l'envoi est retenté.
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 3
+                    delay: 2000
+                    multiplier: 3
+            # Messages définitivement en échec : à inspecter avec messenger:failed:show.
+            failed: 'doctrine://default?queue_name=failed&auto_setup=0'
+
+        routing:
+            App\Shared\Domain\DomainEvent: async
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                # En test, les événements sont traités tout de suite, dans la même requête.
+                async: 'sync://'
