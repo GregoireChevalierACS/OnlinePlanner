@@ -14,13 +14,19 @@ final class Account extends AggregateRoot
     private function __construct(
         private readonly AccountId $id,
         private readonly string $email,
-        private readonly string $passwordHash,
+        private string $passwordHash,
     ) {
     }
 
     public static function register(AccountId $id, string $email, string $passwordHash): self
     {
         return new self($id, self::normalize($email), $passwordHash);
+    }
+
+    /** Le changement de hash invalide aussi les sessions ouvertes (Symfony compare le mot de passe). */
+    public function changePassword(string $passwordHash): void
+    {
+        $this->passwordHash = $passwordHash;
     }
 
     /**
