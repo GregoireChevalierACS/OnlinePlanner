@@ -1,0 +1,8 @@
+framework:
+    rate_limiter:
+        # Demandes de réinitialisation : 3 par adresse IP sur 15 minutes, pour éviter d'inonder
+        # une boîte de réception ou d'utiliser l'API pour envoyer des e-mails en masse.
+        password_reset:
+            policy: sliding_window
+            limit: 3
+            interval: '15 minutes'
