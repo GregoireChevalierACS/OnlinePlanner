@@ -8,6 +8,7 @@ use App\Scheduling\Domain\Appointment\AppointmentRepository;
 use App\Scheduling\Domain\Appointment\Event\AppointmentConfirmed;
 use App\Scheduling\Domain\Provider\ProviderRepository;
 use App\Shared\Application\EventHandler;
+use App\Shared\Application\Notification\Notifier;
 
 final readonly class NotifyOnAppointmentConfirmed implements EventHandler
 {

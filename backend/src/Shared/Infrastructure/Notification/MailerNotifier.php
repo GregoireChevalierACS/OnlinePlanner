@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Scheduling\Infrastructure\Notification;
+namespace App\Shared\Infrastructure\Notification;
 
-use App\Scheduling\Application\Notification\Notification;
-use App\Scheduling\Application\Notification\Notifier;
+use App\Shared\Application\Notification\Notification;
+use App\Shared\Application\Notification\Notifier;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;

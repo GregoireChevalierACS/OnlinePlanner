@@ -6,6 +6,7 @@ namespace App\Scheduling\Application\Notification;
 
 use App\Scheduling\Domain\Appointment\Customer;
 use App\Scheduling\Domain\Availability\TimeSlot;
+use App\Shared\Application\Notification\Notification;
 
 /**
  * Factory : le texte de chaque e-mail, en un seul endroit, testable sans serveur d'e-mail.

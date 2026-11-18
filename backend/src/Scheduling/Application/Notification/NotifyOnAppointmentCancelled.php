@@ -8,6 +8,7 @@ use App\Scheduling\Domain\Appointment\AppointmentRepository;
 use App\Scheduling\Domain\Appointment\Event\AppointmentCancelled;
 use App\Scheduling\Domain\Provider\ProviderRepository;
 use App\Shared\Application\EventHandler;
+use App\Shared\Application\Notification\Notifier;
 
 final readonly class NotifyOnAppointmentCancelled implements EventHandler
 {

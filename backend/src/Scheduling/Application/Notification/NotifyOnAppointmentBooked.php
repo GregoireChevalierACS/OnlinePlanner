@@ -7,6 +7,7 @@ namespace App\Scheduling\Application\Notification;
 use App\Scheduling\Domain\Appointment\Event\AppointmentBooked;
 use App\Scheduling\Domain\Provider\ProviderRepository;
 use App\Shared\Application\EventHandler;
+use App\Shared\Application\Notification\Notifier;
 
 /**
  * Observer : accusé de réception au client et alerte au propriétaire de l'agenda.
