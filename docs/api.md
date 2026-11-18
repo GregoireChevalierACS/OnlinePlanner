@@ -12,6 +12,8 @@ Session par cookie `HttpOnly` posé par l'API (voir ADR 0005). Côté navigateur
 | `POST` | `/api/auth/login` | `email`, `password` | `200` `{ id, email }` ; `401` identifiants incorrects ; `429` trop de tentatives |
 | `GET` | `/api/auth/me` | — | `200` `{ id, email }` ou `401` |
 | `POST` | `/api/auth/logout` | — | `204` |
+| `POST` | `/api/auth/password-reset` | `email` | `202` toujours (lien envoyé seulement si le compte existe) ; `429` au-delà de 3 demandes / 15 min / IP |
+| `POST` | `/api/auth/password-reset/confirm` | `token` (reçu par e-mail), `password` | `204` ; `422` lien invalide, expiré ou déjà utilisé |
 
 ## Routes
 

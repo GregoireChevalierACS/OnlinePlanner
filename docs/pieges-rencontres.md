@@ -18,3 +18,5 @@
 | La recette `symfony/mailer` crée `backend/compose.override.yaml` | Recettes Flex « docker » | Fichier supprimé : les services vivent dans le `compose.yaml` racine | — |
 | `curl` depuis Git Bash : JSON refusé dès qu'il contient un accent | Le terminal Windows n'envoie pas l'UTF-8 | Tester sans accent ou avec `--data-binary @fichier.json` (le navigateur, lui, envoie de l'UTF-8) | — |
 | Le worker exécute encore l'ancien code après une modification | `messenger:consume` est un processus long qui garde le code chargé | `docker compose restart worker` (en production : redémarrage au déploiement, `--time-limit`) | ADR 0006 |
+| Front : `Unexpected end of JSON input` sur une réponse `202` | `response.json()` sur un corps vide (seul `204` était traité) | `HttpClient` lit le texte et renvoie `undefined` si le corps est vide | ADR 0007 |
+| `sed` / `perl` en ligne de commande cassent les espaces de noms PHP (`\N…` interprété) | Les antislashs sont réinterprétés par le shell puis par l'outil | Modifier les `namespace` / `use` avec un éditeur, pas en ligne de commande | — |
