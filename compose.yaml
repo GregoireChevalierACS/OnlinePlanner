@@ -1,16 +1,27 @@
+x-api: &api
+  build: ./docker/php
+  working_dir: /app
+  volumes:
+    - ./backend:/app
+  environment:
+    DATABASE_URL: "postgresql://planner:planner@db:5432/planner?serverVersion=17&charset=utf8"
+    # Les e-mails partent vers Mailpit : rien n'est envoyé pour de vrai, tout est visible sur http://localhost:8025
+    MAILER_DSN: "smtp://mailpit:1025"
+  depends_on:
+    db:
+      condition: service_healthy
+
 services:
   api:
-    build: ./docker/php
-    working_dir: /app
-    volumes:
-      - ./backend:/app
+    <<: *api
     ports:
       - "8000:8000"
-    environment:
-      DATABASE_URL: "postgresql://planner:planner@db:5432/planner?serverVersion=17&charset=utf8"
-    depends_on:
-      db:
-        condition: service_healthy
+
+  # Traite les messages asynchrones (envoi des e-mails), avec reprises en cas d'échec.
+  worker:
+    <<: *api
+    command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600", "-vv"]
+    restart: unless-stopped
 
   db:
     image: postgres:17-alpine
@@ -26,6 +37,11 @@ services:
       retries: 10
     volumes:
       - db-data:/var/lib/postgresql/data
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "8025:8025"
 
 volumes:
   db-data:
