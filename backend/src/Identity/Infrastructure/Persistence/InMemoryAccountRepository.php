@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Infrastructure\Persistence;
 
 use App\Identity\Domain\Account;
+use App\Identity\Domain\AccountId;
 use App\Identity\Domain\AccountRepository;
 use App\Identity\Domain\EmailAlreadyUsed;
 
@@ -32,5 +33,12 @@ final class InMemoryAccountRepository implements AccountRepository
         }
 
         return null;
+    }
+
+    public function find(AccountId $id): ?Account
+    {
+        $account = $this->accounts[$id->value] ?? null;
+
+        return null === $account ? null : clone $account;
     }
 }

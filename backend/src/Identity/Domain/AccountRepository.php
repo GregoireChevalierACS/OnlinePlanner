@@ -12,4 +12,6 @@ interface AccountRepository
     public function save(Account $account): void;
 
     public function findByEmail(string $normalizedEmail): ?Account;
+
+    public function find(AccountId $id): ?Account;
 }

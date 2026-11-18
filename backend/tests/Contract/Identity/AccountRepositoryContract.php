@@ -29,6 +29,16 @@ trait AccountRepositoryContract
         self::assertNull($repository->findByEmail('john@example.com'));
     }
 
+    public function testFindsASavedAccountById(): void
+    {
+        $repository = $this->repository();
+        $repository->save(Account::register(new AccountId('acc-1'), 'jane@example.com', 'hash'));
+        $this->clear();
+
+        self::assertSame('jane@example.com', $repository->find(new AccountId('acc-1'))?->email());
+        self::assertNull($repository->find(new AccountId('inconnu')));
+    }
+
     public function testRefusesASecondAccountWithTheSameEmail(): void
     {
         $repository = $this->repository();
