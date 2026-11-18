@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Double;
 
-use App\Scheduling\Application\Notification\Notification;
-use App\Scheduling\Application\Notification\Notifier;
+use App\Shared\Application\Notification\Notification;
+use App\Shared\Application\Notification\Notifier;
 
 final class RecordingNotifier implements Notifier
 {

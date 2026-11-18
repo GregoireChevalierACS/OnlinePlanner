@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Scheduling\Application\Notification;
+namespace App\Shared\Application\Notification;
 
 /**
  * Message à envoyer, indépendant du canal (e-mail aujourd'hui, SMS demain).

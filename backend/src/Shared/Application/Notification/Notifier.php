@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Scheduling\Application\Notification;
+namespace App\Shared\Application\Notification;
 
 /**
  * Port d'envoi : chaque canal (Symfony Mailer, fournisseur SMS…) en est un adapter.
