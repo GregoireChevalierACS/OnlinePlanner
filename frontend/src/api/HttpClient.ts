@@ -27,9 +27,8 @@ export class HttpClient {
     if (!response.ok) {
       throw await ApiError.fromResponse(response)
     }
-    if (response.status === 204) {
-      return undefined as T
-    }
-    return (await response.json()) as T
+    // 202 et 204 n'ont pas de corps : une réponse vide vaut undefined.
+    const text = await response.text()
+    return (text === '' ? undefined : JSON.parse(text)) as T
   }
 }

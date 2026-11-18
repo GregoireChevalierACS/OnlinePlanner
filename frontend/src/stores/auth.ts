@@ -33,12 +33,12 @@ export const useAuthStore = defineStore('auth', () => {
     return restoring
   }
 
-  async function submit(action: () => Promise<Account>): Promise<boolean> {
+  /** Exécute une action du formulaire : indicateur d'envoi, problème affichable, succès ou échec. */
+  async function submit(action: () => Promise<void>): Promise<boolean> {
     submitting.value = true
     problem.value = null
     try {
-      account.value = await action()
-      restored.value = true
+      await action()
       return true
     } catch (error) {
       problem.value = toProblem(error)
@@ -48,9 +48,24 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const login = (email: string, password: string) => submit(() => gateway.login(email, password))
+  function signIn(connect: () => Promise<Account>): Promise<boolean> {
+    return submit(async () => {
+      account.value = await connect()
+      restored.value = true
+    })
+  }
+
+  const login = (email: string, password: string) => signIn(() => gateway.login(email, password))
   const register = (email: string, password: string) =>
-    submit(() => gateway.register(email, password))
+    signIn(() => gateway.register(email, password))
+  const requestPasswordReset = (email: string) => submit(() => gateway.requestPasswordReset(email))
+  const resetPassword = (token: string, password: string) =>
+    submit(() => gateway.resetPassword(token, password))
+
+  /** Un message d'erreur ne doit pas suivre l'utilisateur d'un formulaire à l'autre. */
+  function clearProblem(): void {
+    problem.value = null
+  }
 
   async function logout(): Promise<void> {
     try {
@@ -70,5 +85,8 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
+    requestPasswordReset,
+    resetPassword,
+    clearProblem,
   }
 })

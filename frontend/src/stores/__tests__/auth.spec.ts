@@ -76,6 +76,36 @@ describe('auth store', () => {
     expect(store.account).toBeNull()
   })
 
+  it('demande un lien de réinitialisation sans connecter personne', async () => {
+    const { auth, store } = setup()
+
+    await expect(store.requestPasswordReset('jane@example.com')).resolves.toBe(true)
+
+    expect(auth.requestPasswordReset).toHaveBeenCalledWith('jane@example.com')
+    expect(store.isAuthenticated).toBe(false)
+  })
+
+  it('change le mot de passe avec le jeton reçu', async () => {
+    const { auth, store } = setup()
+
+    await expect(store.resetPassword('jeton', 'nouveau mot de passe')).resolves.toBe(true)
+
+    expect(auth.resetPassword).toHaveBeenCalledWith('jeton', 'nouveau mot de passe')
+  })
+
+  it('affiche un lien expiré puis efface le message', async () => {
+    const { auth, store } = setup()
+    auth.resetPassword.mockRejectedValue(
+      new ApiError({ status: 422, title: 'Unprocessable', detail: 'Lien expiré.' }),
+    )
+
+    await expect(store.resetPassword('jeton', 'nouveau mot de passe')).resolves.toBe(false)
+    expect(store.problem?.detail).toBe('Lien expiré.')
+
+    store.clearProblem()
+    expect(store.problem).toBeNull()
+  })
+
   it('déconnecte', async () => {
     const { auth, store } = setup()
     await store.login('jane@example.com', 'secret')

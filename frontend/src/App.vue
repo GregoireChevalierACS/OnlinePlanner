@@ -6,6 +6,9 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 
+// Changement de page : on n'affiche plus l'erreur du formulaire précédent.
+router.afterEach(() => auth.clearProblem())
+
 async function logout(): Promise<void> {
   await auth.logout()
   await router.push({ name: 'login' })

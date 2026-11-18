@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import ProblemAlert from '@/components/ProblemAlert.vue'
 import { safeRedirect } from '@/composables/authGuard'
 import { useAuthStore } from '@/stores/auth'
@@ -51,6 +51,8 @@ async function submit(): Promise<void> {
 
     <p class="muted">
       <template v-if="mode === 'login'">
+        <RouterLink :to="{ name: 'forgot-password' }">Mot de passe oublié ?</RouterLink>
+        <br />
         Pas encore de compte ?
         <button type="button" class="link" @click="mode = 'register'">Créer un compte</button>
       </template>

@@ -11,6 +11,9 @@ export interface AuthGateway {
   login(email: string, password: string): Promise<Account>
   register(email: string, password: string): Promise<Account>
   logout(): Promise<void>
+  /** Envoie un lien par e-mail si l'adresse a un compte ; la réponse ne dit pas lequel des deux. */
+  requestPasswordReset(email: string): Promise<void>
+  resetPassword(token: string, password: string): Promise<void>
 }
 
 export const authGatewayKey: InjectionKey<AuthGateway> = Symbol('AuthGateway')
@@ -48,5 +51,13 @@ export class HttpAuthGateway implements AuthGateway {
 
   logout(): Promise<void> {
     return this.http.request('POST', '/api/auth/logout')
+  }
+
+  requestPasswordReset(email: string): Promise<void> {
+    return this.http.request('POST', '/api/auth/password-reset', { email })
+  }
+
+  resetPassword(token: string, password: string): Promise<void> {
+    return this.http.request('POST', '/api/auth/password-reset/confirm', { token, password })
   }
 }

@@ -45,6 +45,12 @@ describe('HttpClient', () => {
     })
   })
 
+  it('renvoie undefined sur 202 sans corps', async () => {
+    const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 202 }))
+
+    await expect(new HttpClient('', fetchFn).request('POST', '/x')).resolves.toBeUndefined()
+  })
+
   it('renvoie undefined sur 204', async () => {
     const fetchFn = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 204 }))
 
