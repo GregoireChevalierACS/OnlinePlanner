@@ -69,6 +69,9 @@ final class SchedulingApiTest extends WebTestCase
             'customerEmail' => 'jane@example.com',
         ]);
         self::assertResponseStatusCodeSame(201);
+        self::assertEmailCount(2);
+        self::assertEmailAddressContains(self::getMailerMessage(0) ?? self::fail('e-mail client absent'), 'To', 'jane@example.com');
+        self::assertEmailAddressContains(self::getMailerMessage(1) ?? self::fail('e-mail prestataire absent'), 'To', 'owner@example.com');
         $appointmentId = self::text($this->json(), 'id');
         $location = "/api/appointments/{$appointmentId}";
         self::assertResponseHeaderSame('Location', $location);
@@ -80,10 +83,14 @@ final class SchedulingApiTest extends WebTestCase
 
         $this->post("{$location}/confirm");
         self::assertResponseStatusCodeSame(204);
+        self::assertEmailCount(1);
+        self::assertEmailSubjectContains(self::getMailerMessage() ?? self::fail('e-mail absent'), 'Rendez-vous confirmé');
         self::assertSame('confirmed', self::text($this->get($location), 'status'));
 
         $this->post("{$location}/cancel", ['reason' => 'Empêchement']);
         self::assertResponseStatusCodeSame(204);
+        self::assertEmailCount(1);
+        self::assertEmailTextBodyContains(self::getMailerMessage() ?? self::fail('e-mail absent'), 'Motif : Empêchement');
 
         $agenda = $this->get("/api/providers/{$providerId}/appointments?from=2026-01-05&to=2026-01-05");
         self::assertCount(1, $agenda);
