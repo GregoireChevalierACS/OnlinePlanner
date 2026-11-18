@@ -20,11 +20,15 @@ echo "APP_SECRET=$(openssl rand -hex 32)" > backend/.env.dev.local   # jamais ve
 
 docker compose build
 docker compose run --rm api composer install
-docker compose up -d                                       # API sur http://localhost:8000, PostgreSQL sur 5432
+docker compose up -d                                       # API :8000, worker, PostgreSQL :5432, Mailpit :8025
 docker compose run --rm api bin/console doctrine:migrations:migrate -n
 
 cd frontend && npm install && npm run dev                  # front sur http://localhost:5173
 ```
+
+Les e-mails (réservation, confirmation, annulation) sont envoyés par le service `worker` et capturés par Mailpit : http://localhost:8025. Après une modification du code PHP des notifications, `docker compose restart worker`.
+
+Messages en échec après 3 reprises : `docker compose exec api bin/console messenger:failed:show` puis `messenger:failed:retry`.
 
 ## Tests et qualité (comme la CI)
 

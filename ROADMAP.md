@@ -12,7 +12,7 @@
 - [x] Infrastructure : bus Messenger (commandes, requêtes, événements), dépôts Doctrine soumis à la suite de contrat, horloge et UUID v7
 - [x] API HTTP (JSON) et traduction des erreurs métier en 4xx (`problem+json`), voir `docs/api.md`
 - [x] Front : création d'agenda, réservation (jour, créneaux, formulaire) et agenda du prestataire (confirmation, annulation avec motif), voir ADR 0004
-- [ ] Notifications par e-mail sur les Domain Events
+- [x] Notifications par e-mail sur les Domain Events, envoyées par un worker avec reprises (ADR 0006)
 - [x] Authentification du prestataire : comptes, session par cookie, propriété des agendas (ADR 0005)
 - [ ] Réinitialisation du mot de passe et vérification de l'adresse e-mail (après les e-mails)
 
