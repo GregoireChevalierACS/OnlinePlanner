@@ -26,6 +26,8 @@ export function fakeAuthGateway() {
     login: vi.fn<AuthGateway['login']>().mockResolvedValue(account),
     register: vi.fn<AuthGateway['register']>().mockResolvedValue(account),
     logout: vi.fn<AuthGateway['logout']>().mockResolvedValue(undefined),
+    requestPasswordReset: vi.fn<AuthGateway['requestPasswordReset']>().mockResolvedValue(undefined),
+    resetPassword: vi.fn<AuthGateway['resetPassword']>().mockResolvedValue(undefined),
   } satisfies AuthGateway
 }
 

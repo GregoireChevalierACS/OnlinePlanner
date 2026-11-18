@@ -46,6 +46,26 @@ describe('HttpAuthGateway', () => {
     expect(init?.body).toBe('{"email":"jane@example.com","password":"secret"}')
   })
 
+  it('demande un lien de réinitialisation', async () => {
+    const { gateway, fetchFn } = gatewayWith(new Response(null, { status: 202 }))
+
+    await expect(gateway.requestPasswordReset('jane@example.com')).resolves.toBeUndefined()
+
+    const [url, init] = fetchFn.mock.calls[0] ?? []
+    expect(url).toBe('/api/auth/password-reset')
+    expect(init?.body).toBe('{"email":"jane@example.com"}')
+  })
+
+  it('change le mot de passe avec le jeton', async () => {
+    const { gateway, fetchFn } = gatewayWith(new Response(null, { status: 204 }))
+
+    await gateway.resetPassword('jeton', 'nouveau mot de passe')
+
+    const [url, init] = fetchFn.mock.calls[0] ?? []
+    expect(url).toBe('/api/auth/password-reset/confirm')
+    expect(init?.body).toBe('{"token":"jeton","password":"nouveau mot de passe"}')
+  })
+
   it('déconnecte', async () => {
     const { gateway, fetchFn } = gatewayWith(new Response(null, { status: 204 }))
 
