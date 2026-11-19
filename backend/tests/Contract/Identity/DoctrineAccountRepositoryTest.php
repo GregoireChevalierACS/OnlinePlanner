@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Contract\Identity;
 
 use App\Identity\Infrastructure\Persistence\DoctrineAccountRepository;
+use App\Identity\Infrastructure\Persistence\DoctrineEmailVerificationRepository;
 use App\Identity\Infrastructure\Persistence\DoctrinePasswordResetRepository;
 use App\Tests\ContainerAccess;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,7 +15,13 @@ final class DoctrineAccountRepositoryTest extends KernelTestCase
 {
     use AccountRepositoryContract;
     use ContainerAccess;
+    use EmailVerificationRepositoryContract;
     use PasswordResetRepositoryContract;
+
+    protected function verifications(): DoctrineEmailVerificationRepository
+    {
+        return self::service(DoctrineEmailVerificationRepository::class);
+    }
 
     protected function repository(): DoctrineAccountRepository
     {

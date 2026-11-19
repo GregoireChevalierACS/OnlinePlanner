@@ -30,7 +30,7 @@ security:
 
     # Seule la première règle correspondante s'applique.
     access_control:
-        - { path: ^/api/auth/(login|register|password-reset|password-reset/confirm)$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/(login|register|password-reset|password-reset/confirm|verify-email)$, roles: PUBLIC_ACCESS }
         # Parcours public de réservation : voir les créneaux et réserver.
         - { path: ^/api/providers/[^/]+/slots$, methods: [GET], roles: PUBLIC_ACCESS }
         - { path: ^/api/providers/[^/]+/appointments$, methods: [POST], roles: PUBLIC_ACCESS }

@@ -61,10 +61,10 @@ final class AuthController extends AbstractController
     }
 
     /**
-     * @return array{id: string, email: string}
+     * @return array{id: string, email: string, emailVerified: bool}
      */
     private static function view(SecurityUser $user): array
     {
-        return ['id' => $user->id, 'email' => $user->getUserIdentifier()];
+        return ['id' => $user->id, 'email' => $user->getUserIdentifier(), 'emailVerified' => $user->emailVerified];
     }
 }

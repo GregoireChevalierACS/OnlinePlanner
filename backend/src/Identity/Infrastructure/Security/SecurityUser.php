@@ -22,6 +22,7 @@ final readonly class SecurityUser implements UserInterface, PasswordAuthenticate
         public string $id,
         private string $email,
         private string $passwordHash,
+        public bool $emailVerified,
     ) {
     }
 
@@ -30,7 +31,7 @@ final readonly class SecurityUser implements UserInterface, PasswordAuthenticate
         $email = $account->email();
         \assert('' !== $email);
 
-        return new self($account->id()->value, $email, $account->passwordHash());
+        return new self($account->id()->value, $email, $account->passwordHash(), $account->isEmailVerified());
     }
 
     public function getUserIdentifier(): string

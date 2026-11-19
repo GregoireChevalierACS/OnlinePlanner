@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Identity;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Mime\Email;
 
 final class AuthApiTest extends WebTestCase
 {
@@ -34,6 +35,49 @@ final class AuthApiTest extends WebTestCase
         $this->client->request('GET', '/api/auth/me');
         self::assertResponseIsSuccessful();
         self::assertSame($created, $this->json());
+        self::assertFalse($created['emailVerified'] ?? null);
+    }
+
+    public function testEmailVerificationJourney(): void
+    {
+        $this->post('/api/auth/register', ['email' => 'jane@example.com', 'password' => self::PASSWORD]);
+        self::assertEmailCount(1);
+        $message = self::getMailerMessage();
+        self::assertInstanceOf(Email::class, $message);
+        self::assertEmailSubjectContains($message, 'Confirmez votre adresse e-mail');
+        preg_match('#/verifier-email\?token=([0-9a-f]{64})#', (string) $message->getTextBody(), $matches);
+        $token = $matches[1] ?? null;
+        self::assertIsString($token);
+
+        $this->post('/api/auth/verify-email/resend');
+        self::assertResponseStatusCodeSame(202);
+        self::assertEmailCount(1, message: 'un nouveau lien tant que l\'adresse n\'est pas vérifiée');
+
+        $this->post('/api/auth/verify-email', ['token' => $token]);
+        self::assertResponseStatusCodeSame(204);
+        $this->client->request('GET', '/api/auth/me');
+        self::assertTrue($this->json()['emailVerified'] ?? null);
+
+        $this->post('/api/auth/verify-email', ['token' => $token]);
+        self::assertResponseStatusCodeSame(422);
+
+        $this->post('/api/auth/verify-email/resend');
+        self::assertResponseStatusCodeSame(202);
+        self::assertEmailCount(0, message: 'plus rien à envoyer une fois vérifiée');
+    }
+
+    public function testResendRequiresALoginAndIsThrottled(): void
+    {
+        $this->post('/api/auth/verify-email/resend');
+        self::assertResponseStatusCodeSame(401);
+
+        $this->post('/api/auth/register', ['email' => 'jane@example.com', 'password' => self::PASSWORD]);
+        for ($i = 0; $i < 3; ++$i) {
+            $this->post('/api/auth/verify-email/resend');
+            self::assertResponseStatusCodeSame(202);
+        }
+        $this->post('/api/auth/verify-email/resend');
+        self::assertResponseStatusCodeSame(429);
     }
 
     public function testLoginLogoutCycle(): void

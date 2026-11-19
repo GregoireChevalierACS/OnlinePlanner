@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Scheduling;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
+use Symfony\Component\Mime\Email;
 
 /**
  * Tests fonctionnels de l'API : de la requête HTTP jusqu'à PostgreSQL et retour.
@@ -187,11 +188,17 @@ final class SchedulingApiTest extends WebTestCase
         self::assertResponseHeaderSame('Content-Type', 'text/html; charset=UTF-8');
     }
 
-    /** Crée un compte : l'API connecte aussitôt le client (cookie de session). */
+    /** Crée un compte (connecté aussitôt) et vérifie son adresse avec le lien reçu par e-mail. */
     private function signUp(string $email): void
     {
         $this->post('/api/auth/register', ['email' => $email, 'password' => 'un mot de passe solide']);
         self::assertResponseStatusCodeSame(201);
+
+        $message = self::getMailerMessage();
+        self::assertInstanceOf(Email::class, $message);
+        preg_match('#token=([0-9a-f]{64})#', (string) $message->getTextBody(), $matches);
+        $this->post('/api/auth/verify-email', ['token' => $matches[1] ?? '']);
+        self::assertResponseStatusCodeSame(204);
     }
 
     private function registerProvider(): string

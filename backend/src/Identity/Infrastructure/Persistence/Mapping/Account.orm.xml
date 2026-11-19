@@ -9,5 +9,6 @@
         <id name="id" type="account_id" column="id"/>
         <field name="email" type="string" length="320"/>
         <field name="passwordHash" type="string" length="255" column="password_hash"/>
+        <field name="emailVerifiedAt" type="datetime_immutable" column="email_verified_at" nullable="true"/>
     </entity>
 </doctrine-mapping>
