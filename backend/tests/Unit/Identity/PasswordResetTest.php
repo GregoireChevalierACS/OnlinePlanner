@@ -8,7 +8,7 @@ use App\Identity\Application\AccountEmails;
 use App\Identity\Application\TokenHash;
 use App\Identity\Domain\Account;
 use App\Identity\Domain\AccountId;
-use App\Identity\Domain\InvalidResetToken;
+use App\Identity\Domain\InvalidLink;
 use App\Identity\Domain\PasswordReset;
 use PHPUnit\Framework\TestCase;
 
@@ -39,8 +39,8 @@ final class PasswordResetTest extends TestCase
         $reset = PasswordReset::issue('hash', new AccountId('acc-1'), $this->issuedAt);
         $reset->consume($this->issuedAt);
 
-        $this->expectException(InvalidResetToken::class);
-        $this->expectExceptionMessage('Ce lien de réinitialisation est invalide ou a expiré. Demandez-en un nouveau.');
+        $this->expectException(InvalidLink::class);
+        $this->expectExceptionMessage('Ce lien est invalide ou a expiré. Demandez-en un nouveau.');
 
         $reset->consume($this->issuedAt);
     }
@@ -51,8 +51,8 @@ final class PasswordResetTest extends TestCase
 
         try {
             $reset->consume(new \DateTimeImmutable('2026-01-05 11:00:00'));
-            self::fail('InvalidResetToken attendue');
-        } catch (InvalidResetToken) {
+            self::fail('InvalidLink attendue');
+        } catch (InvalidLink) {
             self::assertFalse($reset->isUsed());
         }
     }

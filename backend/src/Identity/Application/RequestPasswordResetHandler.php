@@ -22,7 +22,7 @@ final readonly class RequestPasswordResetHandler implements CommandHandler
     public function __construct(
         private AccountRepository $accounts,
         private PasswordResetRepository $resets,
-        private ResetTokens $tokens,
+        private SecretLinks $links,
         private Notifier $notifier,
         private Clock $clock,
     ) {
@@ -39,8 +39,8 @@ final readonly class RequestPasswordResetHandler implements CommandHandler
             return;
         }
 
-        $token = $this->tokens->generate();
+        $token = $this->links->generate();
         $this->resets->save(PasswordReset::issue(TokenHash::of($token), $account->id(), $this->clock->now()));
-        $this->notifier->send(AccountEmails::passwordReset($account->email(), $this->tokens->linkFor($token)));
+        $this->notifier->send(AccountEmails::passwordReset($account->email(), $this->links->passwordResetLink($token)));
     }
 }

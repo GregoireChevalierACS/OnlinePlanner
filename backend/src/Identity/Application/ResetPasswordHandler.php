@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Application;
 
 use App\Identity\Domain\AccountRepository;
-use App\Identity\Domain\InvalidResetToken;
+use App\Identity\Domain\InvalidLink;
 use App\Identity\Domain\PasswordResetRepository;
 use App\Identity\Domain\PlainPassword;
 use App\Shared\Application\CommandHandler;
@@ -24,8 +24,8 @@ final readonly class ResetPasswordHandler implements CommandHandler
     public function __invoke(ResetPassword $command): void
     {
         $password = new PlainPassword($command->password);
-        $reset = $this->resets->findByTokenHash(TokenHash::of($command->token)) ?? throw InvalidResetToken::create();
-        $account = $this->accounts->find($reset->consume($this->clock->now())) ?? throw InvalidResetToken::create();
+        $reset = $this->resets->findByTokenHash(TokenHash::of($command->token)) ?? throw InvalidLink::create();
+        $account = $this->accounts->find($reset->consume($this->clock->now())) ?? throw InvalidLink::create();
 
         $account->changePassword($this->hasher->hash($password));
         $this->accounts->save($account);

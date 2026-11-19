@@ -16,6 +16,7 @@ final readonly class RegisterAccountHandler implements CommandHandler
     public function __construct(
         private AccountRepository $accounts,
         private PasswordHasher $hasher,
+        private EmailVerificationSender $verification,
     ) {
     }
 
@@ -27,6 +28,8 @@ final readonly class RegisterAccountHandler implements CommandHandler
             throw EmailAlreadyUsed::create();
         }
 
-        $this->accounts->save(Account::register(new AccountId($command->accountId), $email, $this->hasher->hash($password)));
+        $account = Account::register(new AccountId($command->accountId), $email, $this->hasher->hash($password));
+        $this->accounts->save($account);
+        $this->verification->sendTo($account);
     }
 }

@@ -15,12 +15,24 @@ final class Account extends AggregateRoot
         private readonly AccountId $id,
         private readonly string $email,
         private string $passwordHash,
+        private ?\DateTimeImmutable $emailVerifiedAt = null,
     ) {
     }
 
     public static function register(AccountId $id, string $email, string $passwordHash): self
     {
         return new self($id, self::normalize($email), $passwordHash);
+    }
+
+    /** L'adresse a reçu et ouvert le lien de vérification : on peut lui écrire en confiance. */
+    public function verifyEmail(\DateTimeImmutable $now): void
+    {
+        $this->emailVerifiedAt ??= $now;
+    }
+
+    public function isEmailVerified(): bool
+    {
+        return null !== $this->emailVerifiedAt;
     }
 
     /** Le changement de hash invalide aussi les sessions ouvertes (Symfony compare le mot de passe). */
