@@ -8,6 +8,19 @@ use App\Shared\Application\Notification\Notification;
 
 final class AccountEmails
 {
+    public static function emailVerification(string $email, string $link): Notification
+    {
+        return new Notification(
+            $email,
+            'Confirmez votre adresse e-mail',
+            "Bonjour,\n\nPour confirmer que cette adresse est bien la vôtre, ouvrez ce lien (valable 2 jours) :\n"
+            .$link
+            ."\n\nTant que l'adresse n'est pas confirmée, vous ne recevez pas les e-mails de nouvelles réservations."
+            ."\nSi vous n'avez pas créé de compte, ignorez cet e-mail."
+            ."\n\nÀ bientôt,\nOnlinePlanner",
+        );
+    }
+
     public static function passwordReset(string $email, string $link): Notification
     {
         return new Notification(

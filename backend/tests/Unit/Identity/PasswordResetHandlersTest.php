@@ -9,23 +9,24 @@ use App\Identity\Application\RequestPasswordReset;
 use App\Identity\Application\RequestPasswordResetHandler;
 use App\Identity\Application\ResetPassword;
 use App\Identity\Application\ResetPasswordHandler;
-use App\Identity\Application\ResetTokens;
 use App\Identity\Application\TokenHash;
 use App\Identity\Domain\Account;
 use App\Identity\Domain\AccountId;
 use App\Identity\Domain\InvalidCredentials;
-use App\Identity\Domain\InvalidResetToken;
+use App\Identity\Domain\InvalidLink;
 use App\Identity\Domain\PasswordReset;
 use App\Identity\Domain\PlainPassword;
 use App\Identity\Infrastructure\Persistence\InMemoryAccountRepository;
 use App\Identity\Infrastructure\Persistence\InMemoryPasswordResetRepository;
+use App\Tests\Double\FakeSecretLinks;
 use App\Tests\Double\FixedClock;
 use App\Tests\Double\RecordingNotifier;
 use PHPUnit\Framework\TestCase;
 
 final class PasswordResetHandlersTest extends TestCase
 {
-    private const string TOKEN = 'jeton-secret';
+    /** Premier jeton émis par FakeSecretLinks. */
+    private const string TOKEN = 'jeton-1';
 
     private InMemoryAccountRepository $accounts;
     private InMemoryPasswordResetRepository $resets;
@@ -74,13 +75,13 @@ final class PasswordResetHandlersTest extends TestCase
         self::assertSame('hash:nouveau mot de passe', $this->accounts->findByEmail('jane@example.com')?->passwordHash());
         self::assertTrue($this->resets->findByTokenHash(TokenHash::of(self::TOKEN))?->isUsed());
 
-        $this->expectException(InvalidResetToken::class);
+        $this->expectException(InvalidLink::class);
         $this->resetHandler()(new ResetPassword(self::TOKEN, 'encore un autre'));
     }
 
     public function testUnknownTokenIsRejected(): void
     {
-        $this->expectException(InvalidResetToken::class);
+        $this->expectException(InvalidLink::class);
 
         $this->resetHandler()(new ResetPassword('inconnu', 'nouveau mot de passe'));
     }
@@ -89,7 +90,7 @@ final class PasswordResetHandlersTest extends TestCase
     {
         $this->resets->save(PasswordReset::issue(TokenHash::of(self::TOKEN), new AccountId('disparu'), $this->clock->now()));
 
-        $this->expectException(InvalidResetToken::class);
+        $this->expectException(InvalidLink::class);
 
         $this->resetHandler()(new ResetPassword(self::TOKEN, 'nouveau mot de passe'));
     }
@@ -108,23 +109,7 @@ final class PasswordResetHandlersTest extends TestCase
 
     private function requestHandler(): RequestPasswordResetHandler
     {
-        $tokens = new class(self::TOKEN) implements ResetTokens {
-            public function __construct(private readonly string $token)
-            {
-            }
-
-            public function generate(): string
-            {
-                return $this->token;
-            }
-
-            public function linkFor(string $token): string
-            {
-                return 'https://app.test/reset?t='.$token;
-            }
-        };
-
-        return new RequestPasswordResetHandler($this->accounts, $this->resets, $tokens, $this->notifier, $this->clock);
+        return new RequestPasswordResetHandler($this->accounts, $this->resets, new FakeSecretLinks(), $this->notifier, $this->clock);
     }
 
     private function resetHandler(): ResetPasswordHandler
