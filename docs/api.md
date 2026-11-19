@@ -8,12 +8,14 @@ Session par cookie `HttpOnly` posé par l'API (voir ADR 0005). Côté navigateur
 
 | Méthode | Route | Corps | Réponse |
 | --- | --- | --- | --- |
-| `POST` | `/api/auth/register` | `email`, `password` (12 caractères min.) | `201` `{ id, email }`, session ouverte |
-| `POST` | `/api/auth/login` | `email`, `password` | `200` `{ id, email }` ; `401` identifiants incorrects ; `429` trop de tentatives |
-| `GET` | `/api/auth/me` | — | `200` `{ id, email }` ou `401` |
+| `POST` | `/api/auth/register` | `email`, `password` (12 caractères min.) | `201` `{ id, email, emailVerified: false }`, session ouverte, lien de vérification envoyé |
+| `POST` | `/api/auth/login` | `email`, `password` | `200` `{ id, email, emailVerified }` ; `401` identifiants incorrects ; `429` trop de tentatives |
+| `GET` | `/api/auth/me` | — | `200` `{ id, email, emailVerified }` ou `401` |
 | `POST` | `/api/auth/logout` | — | `204` |
 | `POST` | `/api/auth/password-reset` | `email` | `202` toujours (lien envoyé seulement si le compte existe) ; `429` au-delà de 3 demandes / 15 min / IP |
 | `POST` | `/api/auth/password-reset/confirm` | `token` (reçu par e-mail), `password` | `204` ; `422` lien invalide, expiré ou déjà utilisé |
+| `POST` | `/api/auth/verify-email` | `token` (reçu par e-mail à l'inscription) | `204` ; `422` lien invalide, expiré ou déjà utilisé |
+| `POST` | `/api/auth/verify-email/resend` | — (session requise) | `202` ; `429` au-delà de 3 renvois / 15 min |
 
 ## Routes
 
