@@ -15,7 +15,8 @@
 - [x] Notifications par e-mail sur les Domain Events, envoyées par un worker avec reprises (ADR 0006)
 - [x] Authentification du prestataire : comptes, session par cookie, propriété des agendas (ADR 0005)
 - [x] Réinitialisation du mot de passe par lien à usage unique (ADR 0007)
-- [ ] Vérification de l'adresse e-mail à l'inscription (même mécanisme de jeton)
+- [x] Vérification de l'adresse e-mail à l'inscription (ADR 0008)
+- [ ] Recette manuelle complète dans un navigateur : `docs/recette-phase-1.md`
 
 **Terminée quand :** la CI est verte avec couverture 100 % et MSI ≥ 80 % sur domaine et application, et un rendez-vous peut être réservé, confirmé et annulé de bout en bout via le front.
 
@@ -34,5 +35,4 @@ Déploiement automatisé, sauvegardes, supervision.
 ## Défauts connus
 
 - **Fuseaux horaires** : les horaires d'ouverture sont interprétés dans le fuseau des dates reçues. Ajouter un fuseau par prestataire avant l'essai réel.
-- **Adresse non vérifiée** : un compte peut être créé avec l'adresse de quelqu'un d'autre ; les e-mails de nouvelles réservations partiraient alors chez cette personne.
 - **Demandes de réinitialisation expirées** conservées en base : prévoir une purge périodique.

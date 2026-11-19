@@ -20,3 +20,5 @@
 | Le worker exécute encore l'ancien code après une modification | `messenger:consume` est un processus long qui garde le code chargé | `docker compose restart worker` (en production : redémarrage au déploiement, `--time-limit`) | ADR 0006 |
 | Front : `Unexpected end of JSON input` sur une réponse `202` | `response.json()` sur un corps vide (seul `204` était traité) | `HttpClient` lit le texte et renvoie `undefined` si le corps est vide | ADR 0007 |
 | `sed` / `perl` en ligne de commande cassent les espaces de noms PHP (`\N…` interprété) | Les antislashs sont réinterprétés par le shell puis par l'outil | Modifier les `namespace` / `use` avec un éditeur, pas en ligne de commande | — |
+| PHPStan : « Expression on left side of ?? is not nullable » sur un `find()` qui peut renvoyer `null` | PHPStan mémorise le résultat d'un appel identique déjà vérifié par une assertion | Ne pas re-vérifier ; ou nommer la variable différemment si l'appel n'est pas identique | — |
+| Doctrine : factoriser deux entités sans changer leurs tables | — | `<mapped-superclass>` dans le mapping XML (`OneTimeToken.orm.xml`) : chaque entité garde sa table | ADR 0008 |
