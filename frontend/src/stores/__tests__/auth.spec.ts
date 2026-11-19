@@ -106,6 +106,47 @@ describe('auth store', () => {
     expect(store.problem).toBeNull()
   })
 
+  it("rappelle de vérifier l'adresse tant qu'elle ne l'est pas", async () => {
+    const { auth, store } = setup()
+    expect(store.needsEmailVerification).toBe(false)
+
+    await store.login('jane@example.com', 'secret')
+    expect(store.needsEmailVerification).toBe(true)
+
+    await expect(store.verifyEmail('jeton')).resolves.toBe(true)
+
+    expect(auth.verifyEmail).toHaveBeenCalledWith('jeton')
+    expect(store.account?.emailVerified).toBe(true)
+    expect(store.needsEmailVerification).toBe(false)
+  })
+
+  it('vérifie une adresse depuis un autre appareil, sans session', async () => {
+    const { store } = setup()
+
+    await expect(store.verifyEmail('jeton')).resolves.toBe(true)
+
+    expect(store.account).toBeNull()
+  })
+
+  it('affiche un lien de vérification invalide', async () => {
+    const { auth, store } = setup()
+    auth.verifyEmail.mockRejectedValue(
+      new ApiError({ status: 422, title: 'Unprocessable', detail: 'Lien invalide.' }),
+    )
+
+    await expect(store.verifyEmail('jeton')).resolves.toBe(false)
+
+    expect(store.problem?.detail).toBe('Lien invalide.')
+  })
+
+  it('renvoie le lien de vérification', async () => {
+    const { auth, store } = setup()
+
+    await expect(store.resendEmailVerification()).resolves.toBe(true)
+
+    expect(auth.resendEmailVerification).toHaveBeenCalled()
+  })
+
   it('déconnecte', async () => {
     const { auth, store } = setup()
     await store.login('jane@example.com', 'secret')

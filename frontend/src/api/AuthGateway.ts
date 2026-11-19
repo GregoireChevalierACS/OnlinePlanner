@@ -14,6 +14,9 @@ export interface AuthGateway {
   /** Envoie un lien par e-mail si l'adresse a un compte ; la réponse ne dit pas lequel des deux. */
   requestPasswordReset(email: string): Promise<void>
   resetPassword(token: string, password: string): Promise<void>
+  verifyEmail(token: string): Promise<void>
+  /** Renvoie le lien de vérification au compte connecté. */
+  resendEmailVerification(): Promise<void>
 }
 
 export const authGatewayKey: InjectionKey<AuthGateway> = Symbol('AuthGateway')
@@ -59,5 +62,13 @@ export class HttpAuthGateway implements AuthGateway {
 
   resetPassword(token: string, password: string): Promise<void> {
     return this.http.request('POST', '/api/auth/password-reset/confirm', { token, password })
+  }
+
+  verifyEmail(token: string): Promise<void> {
+    return this.http.request('POST', '/api/auth/verify-email', { token })
+  }
+
+  resendEmailVerification(): Promise<void> {
+    return this.http.request('POST', '/api/auth/verify-email/resend')
   }
 }

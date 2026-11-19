@@ -66,6 +66,25 @@ describe('HttpAuthGateway', () => {
     expect(init?.body).toBe('{"token":"jeton","password":"nouveau mot de passe"}')
   })
 
+  it("vérifie l'adresse avec le jeton", async () => {
+    const { gateway, fetchFn } = gatewayWith(new Response(null, { status: 204 }))
+
+    await gateway.verifyEmail('jeton')
+
+    const [url, init] = fetchFn.mock.calls[0] ?? []
+    expect(url).toBe('/api/auth/verify-email')
+    expect(init?.body).toBe('{"token":"jeton"}')
+  })
+
+  it('renvoie le lien de vérification', async () => {
+    const { gateway, fetchFn } = gatewayWith(new Response(null, { status: 202 }))
+
+    await gateway.resendEmailVerification()
+
+    expect(fetchFn.mock.calls[0]?.[0]).toBe('/api/auth/verify-email/resend')
+    expect(fetchFn.mock.calls[0]?.[1]?.method).toBe('POST')
+  })
+
   it('déconnecte', async () => {
     const { gateway, fetchFn } = gatewayWith(new Response(null, { status: 204 }))
 

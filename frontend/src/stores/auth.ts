@@ -61,6 +61,22 @@ export const useAuthStore = defineStore('auth', () => {
   const requestPasswordReset = (email: string) => submit(() => gateway.requestPasswordReset(email))
   const resetPassword = (token: string, password: string) =>
     submit(() => gateway.resetPassword(token, password))
+  const resendEmailVerification = () => submit(() => gateway.resendEmailVerification())
+
+  /** Le lien peut être ouvert sans être connecté (autre appareil) : on met à jour le compte s'il est chargé. */
+  function verifyEmail(token: string): Promise<boolean> {
+    return submit(async () => {
+      await gateway.verifyEmail(token)
+      if (account.value !== null) {
+        account.value = { ...account.value, emailVerified: true }
+      }
+    })
+  }
+
+  /** État dérivé : faut-il rappeler au prestataire de vérifier son adresse ? */
+  const needsEmailVerification = computed(
+    () => account.value !== null && !account.value.emailVerified,
+  )
 
   /** Un message d'erreur ne doit pas suivre l'utilisateur d'un formulaire à l'autre. */
   function clearProblem(): void {
@@ -87,6 +103,9 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     requestPasswordReset,
     resetPassword,
+    verifyEmail,
+    resendEmailVerification,
+    needsEmailVerification,
     clearProblem,
   }
 })
