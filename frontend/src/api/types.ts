@@ -3,6 +3,8 @@
 export interface Account {
   id: string
   email: string
+  /** Tant que l'adresse n'est pas vérifiée, le compte ne reçoit pas les e-mails de réservation. */
+  emailVerified: boolean
 }
 
 export interface ProviderSummary {

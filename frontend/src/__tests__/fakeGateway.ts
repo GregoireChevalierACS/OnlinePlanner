@@ -3,7 +3,7 @@ import { createApp } from 'vue'
 import { createPinia, setActivePinia, type Pinia } from 'pinia'
 import { authGatewayKey, type AuthGateway } from '@/api/AuthGateway'
 import { schedulingGatewayKey, type SchedulingGateway } from '@/api/SchedulingGateway'
-import type { Appointment, Slot } from '@/api/types'
+import type { Account, Appointment, Slot } from '@/api/types'
 
 /** Double de test du port : chaque méthode est un espion configurable. */
 export function fakeGateway() {
@@ -18,7 +18,7 @@ export function fakeGateway() {
   } satisfies SchedulingGateway
 }
 
-export const account = { id: 'acc-1', email: 'jane@example.com' }
+export const account: Account = { id: 'acc-1', email: 'jane@example.com', emailVerified: false }
 
 export function fakeAuthGateway() {
   return {
@@ -28,6 +28,10 @@ export function fakeAuthGateway() {
     logout: vi.fn<AuthGateway['logout']>().mockResolvedValue(undefined),
     requestPasswordReset: vi.fn<AuthGateway['requestPasswordReset']>().mockResolvedValue(undefined),
     resetPassword: vi.fn<AuthGateway['resetPassword']>().mockResolvedValue(undefined),
+    verifyEmail: vi.fn<AuthGateway['verifyEmail']>().mockResolvedValue(undefined),
+    resendEmailVerification: vi
+      .fn<AuthGateway['resendEmailVerification']>()
+      .mockResolvedValue(undefined),
   } satisfies AuthGateway
 }
 

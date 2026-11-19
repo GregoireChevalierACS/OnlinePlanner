@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+import VerifyEmailBanner from '@/components/VerifyEmailBanner.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
@@ -35,6 +36,7 @@ async function logout(): Promise<void> {
   </header>
 
   <main class="container">
+    <VerifyEmailBanner v-if="auth.needsEmailVerification" />
     <RouterView />
   </main>
 </template>
