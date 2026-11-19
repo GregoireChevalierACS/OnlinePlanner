@@ -20,8 +20,11 @@ final readonly class AccountOwnerDirectory implements OwnerDirectory
     {
     }
 
+    /** Seule une adresse vérifiée reçoit les réservations : sinon, elle pourrait appartenir à quelqu'un d'autre. */
     public function emailOf(OwnerId $ownerId): ?string
     {
-        return $this->accounts->find(new AccountId($ownerId->value))?->email();
+        $account = $this->accounts->find(new AccountId($ownerId->value));
+
+        return null !== $account && $account->isEmailVerified() ? $account->email() : null;
     }
 }

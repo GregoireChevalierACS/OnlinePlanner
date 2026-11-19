@@ -50,3 +50,4 @@ when@test:
         App\Scheduling\Infrastructure\Persistence\Doctrine\DoctrineProviderRepository: ~
         App\Identity\Infrastructure\Persistence\DoctrineAccountRepository: ~
         App\Identity\Infrastructure\Persistence\DoctrinePasswordResetRepository: ~
+        App\Identity\Infrastructure\Persistence\DoctrineEmailVerificationRepository: ~
