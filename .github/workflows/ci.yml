@@ -52,7 +52,20 @@ jobs:
           php-version: '8.4'
           extensions: pdo_pgsql, intl
           coverage: pcov
-      - run: composer install --no-interaction --no-progress
+      # Cache des paquets Composer : moins de téléchargements, donc moins de refus « 429 » de GitHub.
+      - name: Dossier du cache Composer
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+      - name: Dépendances PHP
+        run: composer install --no-interaction --no-progress
+        env:
+          # Téléchargements authentifiés auprès de GitHub : limites bien plus hautes qu'en anonyme.
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_TOKEN }}"}}'
       - run: vendor/bin/php-cs-fixer check --diff
       - run: vendor/bin/phpstan analyse --no-progress
       - name: Base de test et migrations
